@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class CourseController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth')->except(['index']);
+        $this->middleware('role:admin')->except(['index', 'show']);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -44,7 +50,6 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        // server side validation the request data
         $validated = $request->validate([
             'title' => 'required|max:255',
             'instructor' => 'required|max:255',
@@ -53,7 +58,8 @@ class CourseController extends Controller
         ]);
 
         Course::create($validated);
-        return redirect()->route('courses.index')->with('success', 'Course created successfully.');
+        return redirect()->route('courses.index')
+            ->with('success', 'Course created successfully.');
     }
 
     /**
